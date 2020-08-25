@@ -89,6 +89,7 @@ data_to_input_in_solver match_info_format_to_solver_input_format(const nlohmann:
     return res;
 }
 
+// 行動の種類を表す文字列を自分が作成したフォーマットからKakomimasuのフォーマットに変更する関数
 nlohmann::json next_agents_move_to_json(vector<Action> moves) {
     nlohmann::json res = nlohmann::json::object();
     time_t now = time(NULL);
@@ -98,7 +99,6 @@ nlohmann::json next_agents_move_to_json(vector<Action> moves) {
         char t_tmcit = moves[i].get_behavior();
         string t_Kakomimasu = "STAY";
 
-        // 行動の種類を表す文字列をtmcit時のフォーマットからKakomimasuのフォーマットに変更
         if(t_tmcit == 'a') t_Kakomimasu = "PUT";
         else if (t_tmcit == 'w') t_Kakomimasu = "MOVE";
         else if(t_tmcit == 'e') t_Kakomimasu = "REMOVE";
@@ -130,6 +130,7 @@ int main() {
     const string gameId = match_info["gameId"];
     const int team = match_info["index"];
     
+    // 試合が始まるまで待機する
     nlohmann::json game_info;
     do {
         game_info = getGameInfo(gameId, false);
@@ -158,6 +159,7 @@ int main() {
         nlohmann::json next_actions = next_agents_move_to_json(next_agents_move);
         setAction(gameId, token, next_actions.dump());
 
+        // 次のターンになるまで待機する
         do {
             game_info = getGameInfo(gameId, false);
             sleep_ms(100);
