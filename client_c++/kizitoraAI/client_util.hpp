@@ -75,7 +75,7 @@ nlohmann::json get(const std::string host, const std::string path, const bool pr
 // 指定した名前のユーザーが存在するかどうか調べる
 // 存在しない場合は「{"error":"Can not find user."}」を返す
 nlohmann::json userShow(const std::string name) {
-    return http_methods::get(host, "/users/show/" + name);
+    return http_methods::get(host, "/api/users/show/" + name);
 }
 
 // 3つの引数を元にjsonデータを作成し、サーバーに登録する
@@ -87,7 +87,7 @@ nlohmann::json userRegist(const std::string sn, const std::string n, const std::
     };
 
     // dumpメソッドを使うことで、jsonインスタンスをJSON形式の文字列に変換する
-    return http_methods::post(host, "/users/regist", user_info.dump());
+    return http_methods::post(host, "/api/users/regist", user_info.dump());
 }
 
 // サーバーにプレイヤーを登録し、トークとゲームIDのjsonデータを返す
@@ -98,15 +98,15 @@ nlohmann::json match(const std::string id, const std::string pw, const std::stri
         {"spec", spec}
     };
 
-    return http_methods::post(host, "/match", match_info.dump());
+    return http_methods::post(host, "/api/match", match_info.dump());
 }
 
 nlohmann::json getGameInfo(const std::string gi, const bool print) {
-    return http_methods::get(host, "/match/" + gi, print);
+    return http_methods::get(host, "/api/match/" + gi, print);
 }
 
 nlohmann::json setAction(const std::string id, const std::string token, const std::string json_of_agent_actions) {
-    return http_methods::post(host, "/match/" + id + "/action", json_of_agent_actions, token);
+    return http_methods::post(host, "/api/match/" + id + "/action", json_of_agent_actions, token);
 }
 
 void sleep_ms(int x) { std::this_thread::sleep_for(std::chrono::milliseconds(x)); }
