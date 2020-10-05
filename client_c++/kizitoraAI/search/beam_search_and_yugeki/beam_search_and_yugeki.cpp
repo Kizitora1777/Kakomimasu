@@ -213,23 +213,19 @@ namespace beam_search_and_yugeki {
             std::priority_queue<Node> next_state;
 
             for (int i = 0; i < BEAM_WIDTH; i++) {
-                std::cout << "1" << std::endl;
                 if (now_state.empty()) break;
 
                 const Node now_node = now_state.top();
                 now_state.pop();
 
-                std::cout << "2" << std::endl;
                 // next_permurationをdo-whileするための前処理
                 std::vector<std::vector<Action>> agents_action
                     = enumrate_next_action(now_node.turn_info);
-                std::cout << "2.5" << std::endl;
 
                 agents_action.resize(BEAM_SEARCH_AGENT_NUM);
                 std::vector<int> agents_id(BEAM_SEARCH_AGENT_NUM);
                 std::vector<Action> next_agents_action(BEAM_SEARCH_AGENT_NUM);
 
-                std::cout << "3" << std::endl;
                 for (int i = 0; i < BEAM_SEARCH_AGENT_NUM; ++i)
                     next_agents_action[i] = agents_action[i].front();
 
@@ -251,8 +247,6 @@ namespace beam_search_and_yugeki {
                         next_node.first_move_pos = now_node.first_move_pos;
 
                     next_state.push(next_node);
-
-                std::cout << "4" << std::endl;
                 } while (next_permuration(agents_action, 0, agents_id, next_agents_action));
             }
 
