@@ -58,29 +58,40 @@ data_to_input_in_solver match_info_format_to_solver_input_format(const nlohmann:
         int r = match_info["tiled"][k][1];
 
         if(r == -1) f[i][j] = 0;
-        else if (l == 0 &&  r == 0) f[i][j] = 1;
-        else if (l == 1 &&  r == 0) f[i][j] = 2;
-        else if (l == 0 &&  r == 1) f[i][j] = 3;
-        else if (l == 1 &&  r == 1) f[i][j] = 4;
-
+        else if (l == 0 &&  r == 0) {
+            if(team == 0) f[i][j] = 1;
+            else f[i][j] = 3;
+        }
+        else if (l == 1 &&  r == 0) {
+            if(team == 0) f[i][j] = 2;
+            else f[i][j] = 4;
+        }
+        else if (l == 0 &&  r == 1) {
+            if(team == 0) f[i][j] = 3;
+            else f[i][j] = 1;
+        }
+        else if (l == 1 &&  r == 1) {
+            if(team == 0) f[i][j] = 4;
+            else f[i][j] = 2;
+        }
         if(j == (w - 1)) i++, j = 0;
         else j++;
     }
 
     vector<vector<pair<int, int>>> ap(2, vector<pair<int, int>>(a));
+
     if(team == 0) {
         for(int i = 0; i <= 1; ++i) {
             for(int j = 0; j < a; ++j) {
-                ap[i][j] = make_pair(match_info["players"][team]["agents"][j]["x"], match_info["players"][team]["agents"][j]["y"]);
+                ap[i][j] = make_pair(match_info["players"][i]["agents"][j]["x"], match_info["players"][i]["agents"][j]["y"]);
             }
         }
     }
     else {
-        for(int i = 1; i >= 0; --i) {
-            for(int j = 0; j < a; ++j) {
-                ap[i][j] = make_pair(match_info["players"][team]["agents"][j]["x"], match_info["players"][team]["agents"][j]["y"]);
-            }
-        }
+        for(int j = 0; j < a; ++j)
+            ap[0][j] = make_pair(match_info["players"][1]["agents"][j]["x"], match_info["players"][1]["agents"][j]["y"]);
+        for(int j = 0; j < a; ++j)
+            ap[1][j] = make_pair(match_info["players"][0]["agents"][j]["x"], match_info["players"][0]["agents"][j]["y"]);
     }
 
     //ap[team][i] = make_pair(match_info["players"][team]["agents"][i]["x"], match_info["players"][team]["agents"][i]["y"]);
@@ -138,7 +149,7 @@ int main() {
     } while (game_info["gaming"] == false);
     
     while (game_info["turn"] <= game_info["totalTurn"]) {
-        data_to_input_in_solver input_datas = match_info_format_to_solver_input_format(getGameInfo(gameId, true), team);
+        data_to_input_in_solver input_datas = match_info_format_to_solver_input_format(getGameInfo(gameId, false), team);
 
         vector<Action> next_agents_move;
 
