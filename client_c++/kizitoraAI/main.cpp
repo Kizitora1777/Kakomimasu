@@ -165,7 +165,8 @@ int main() {
                                                     input_datas.tile,
                                                     input_datas.agent_positions);
 
-        next_agents_move = maximize_wall_point_and_yugeki::maximize_wall_point_and_yugeki_search(turn_info);
+        //next_agents_move = maximize_wall_point_and_yugeki::maximize_wall_point_and_yugeki_search(turn_info);
+        next_agents_move = beam_search_and_yugeki::beam_search_and_yugeki_search(turn_info);
 
         nlohmann::json next_actions = next_agents_move_to_json(next_agents_move);
         setAction(gameId, token, next_actions.dump());
