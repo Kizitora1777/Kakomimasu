@@ -6,8 +6,8 @@
 
 
 namespace beam_search_and_yugeki {
-    constexpr int BEAM_DEPTH = 10;
-    constexpr int BEAM_WIDTH = 50;
+    constexpr int BEAM_DEPTH = 3;
+    constexpr int BEAM_WIDTH = 10;
 
     // ビームサーチを行うエージェントの最大値。5つ以上だと一気に処理が遅くなるので無理
     constexpr int MAX_BEAM_SEARCH_AGENT_NUM = 4;
@@ -17,15 +17,13 @@ namespace beam_search_and_yugeki {
                                                             std::vector<bool>(MAX_BOARD_SIZE));
 
 
-    // 各エージェントの8近傍に対しての行動候補を列挙する関数
-    // エージェントが未配置の場合は、8つの配置候補を列挙する。
+
     std::vector<std::vector<Action>> enumrate_next_action(const TurnInfo& turn_info) {
         std::vector<std::vector<Action>> candidate(turn_info.get_max_agent_num());
 
         for (int i = 0; i < turn_info.get_max_agent_num(); ++i) {
             Cell agent_pos = turn_info.get_agent_pos(i, ALLY);
 
-            // 未配置の場合は、最もポイントの高い8つのマスを候補として列挙する
             if (agent_pos == Cell(-1, -1)) {
                 std::priority_queue<std::pair<int, Cell>> pq;
 
@@ -38,7 +36,6 @@ namespace beam_search_and_yugeki {
                     }
                 }
 
-                // 8近傍分の候補を取る。これはwalkやeraseが最大で8近傍取れるのに合わせている
                 for (int j = 0; j < kNextToEit.size(); ++j) {
                     const Cell best_pos = pq.top().second;
                     pq.pop();
@@ -156,8 +153,8 @@ namespace beam_search_and_yugeki {
             const Cell next = target_pos + kNextToEit[direction];
             if (now_agent_pos == next)
                 continue;
-            else if (turn_info.get_cell_state(next) == ALLY_WALL)
-                continue;
+            else if (turn_info.is_outside(next) == true) continue;
+            else if (turn_info.get_cell_state(next) == ALLY_WALL) continue;
             else {
                 target_pos_k8[next] = true;
             }
@@ -176,6 +173,9 @@ namespace beam_search_and_yugeki {
                 const Cell next = now.now + kNextToEit[direction];
                 const int ny = next.get_y();
                 const int nx = next.get_x();
+
+                if(turn_info.is_outside(next) == true) continue;
+
                 const int ns = turn_info.get_cell_state(next);
 
                 if (turn_info.is_outside(next) == false && checked[ny][nx] == false
@@ -280,6 +280,8 @@ namespace beam_search_and_yugeki {
             else {
                 const Cell& next_pos
                     = search_next_pos_to_surround_target_pos(turn_info, now_agent_pos, target_pos);
+
+                if(next_pos == Cell(-1, -1)) continue;
 
                 if (next_pos == Cell(-1, -1))
                     agents_action.push_back(Action('n', Cell()));
